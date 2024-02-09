@@ -45,8 +45,8 @@ urlpatterns = [
         "auth/",
         include("auth_login.urls")),
     path(
-        "home/",
-        include("home.urls")),
+        "ride/",
+        include("rider.urls")),
     path(
         settings.ADMIN_URL,
         admin.site.urls),

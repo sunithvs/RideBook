@@ -214,14 +214,14 @@ LOGGING = {
         'organisation': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGGING_ROOT, 'home.log'),
+            'filename': os.path.join(LOGGING_ROOT, 'rider.log'),
             'maxBytes': 1024 * 1024 * 15,  # 5MB
             'backupCount': 0,
             'formatter': 'standard',
         }, 'auth': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGGING_ROOT, 'home.log'),
+            'filename': os.path.join(LOGGING_ROOT, 'rider.log'),
             'maxBytes': 1024 * 1024 * 15,  # 5MB
             'backupCount': 0,
             'formatter': 'standard',

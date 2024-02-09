@@ -62,13 +62,14 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     'drf_yasg',
     'ckeditor',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'django.contrib.gis'
 ]
 
 # Custom apps
 CUSTOM_APPS = [
     "auth_login",
-    'home',
+    'rider',
 ]
 
 INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY_APPS

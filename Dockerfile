@@ -15,6 +15,12 @@ COPY . /code/
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install GDAL dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gdal-bin \
+        libgdal-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Expose the port on which Gunicorn will run
 EXPOSE 8000
