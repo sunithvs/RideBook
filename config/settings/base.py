@@ -73,7 +73,7 @@ CUSTOM_APPS = [
 INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY_APPS
 
 # Application name
-APPLICATION_NAME = 'internship task'
+APPLICATION_NAME = 'RIDER'
 
 # Login URL
 LOGIN_URL = "/auth/login/pass/"

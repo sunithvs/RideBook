@@ -1,13 +1,11 @@
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin
 from django.core import mail
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from base.utils import get_file_path
 
 
 def generate_unique_code():
@@ -120,11 +118,5 @@ class User(BaseUser):
     sex = models.CharField(
         max_length=10, blank=True, choices=[
             ("male", "male"), ("female", "female"), ("other", "other")])
-    profile = models.ImageField(upload_to=get_file_path, blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
-    is_verified = models.BooleanField(default=False)
     mobile_number = models.CharField(max_length=20, blank=True, null=True)
 
-    class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"

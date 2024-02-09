@@ -10,24 +10,17 @@ DEBUG = False
 
 # Allowed hosts
 ALLOWED_HOSTS = [
-    'api.beta.eventsradar.in',
-    'beta.eventsradar.in',
-    'eventsradar.in',
-    'localhost'
+    'rider.sunithvs.com',
 ]
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://api.beta.eventsradar.in',
-    'https://beta.eventsradar.in',
-    'https://eventsradar.in',
+    'https://rider.sunithvs.com',
 ]
 
 # CORS settings
 CORS_ORIGIN_WHITELIST = [
-    'https://api.beta.eventsradar.in',
-    'https://beta.eventsradar.in',
-    'https://eventsradar.in',
+    'https://rider.sunithvs.com',
 ]
 CORS_ORIGIN_ALLOW_ALL = False
 

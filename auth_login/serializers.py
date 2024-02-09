@@ -12,24 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'email', 'full_name',
-                  "profile",
-                  "bio", "is_verified", "mobile_number", 'follow_count'
+                  "mobile_number",
                   )
         extra_kwargs = {
             "id": {"read_only": True},
-            "follow_count": {"read_only": True},
-            "is_verified": {"read_only": True},
-
         }
-
-    def get_follow_count(self, obj):
-        return obj.following.count()
-
-    @staticmethod
-    def get_profile(obj):
-        if obj.profile:
-            return f"{settings.MEDIA_BASE_URL}{obj.profile.url}"
-        return ''
 
 
 class LoginSerializer(serializers.Serializer):

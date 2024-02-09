@@ -99,31 +99,6 @@ class Profile(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#
-# #  logout API
-# class LogoutView(generics.GenericAPIView):
-#     """
-#     A view for logging out an authenticated user by deleting their authentication token.
-#     """
-#
-#     # Define the permissions required to access this view
-#     permission_classes = [permissions.IsAuthenticated, ]
-#
-#     # Set the serializer class used to serialize and deserialize user data
-#
-#     def post(self, request, *args, **kwargs):
-#         """
-#         Log out the currently authenticated user by deleting their authentication token.
-#         """
-#         # Delete the user's authentication token to force them to log in again
-#         logger.info(f"User {request.user.id} is logging out.")
-#
-#         request.user.auth_token.delete()
-#
-#         # Return a success response
-#         return Response(status=status.HTTP_200_OK)
-
-# MAKE LOGOUT VIEW JUST APIVIEW
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
 
@@ -141,75 +116,6 @@ class LogoutView(APIView):
 
 
 class LoginView(generics.GenericAPIView):
-    """
-    A view for handling user login via Google OAuth2 authentication.
-    """
-
-    # Set the serializer class used to serialize and deserialize user data
-    serializer_class = LoginSerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Authenticate the user using Google OAuth2 and generate access and refresh tokens.
-        """
-        # Get the user's Google OAuth2 token from the request data
-        logger.info(f"User is logging in.")
-        google_key = request.data.get('google_key')
-
-        # If a Google OAuth2 token was provided, attempt to authenticate the
-        # user
-        if google_key:
-            try:
-                # Verify the Google OAuth2 token and extract user information
-                user_info = id_token.verify_oauth2_token(
-                    google_key, requests.Request(),
-                    GOOGLE_CLIENT_ID
-                )
-                logger.info(
-                    f"User {user_info['email']} is trying to logging in.",
-                    extra={
-                        'data': user_info})
-
-                # Attempt to retrieve an existing user with the authenticated
-                # email address
-                user = User.objects.filter(email=user_info['email']).first()
-
-                # If a user with the authenticated email exists, generate
-                # access and refresh tokens and return them
-                if user:
-                    logger.info(f"User {user.get_full_name()} is logging in.")
-                    token = RefreshToken.for_user(user)
-                    return Response({
-                        'refresh': str(token),
-                        'access': str(token.access_token),
-                    })
-                # If no user with the authenticated email exists, create a new user and generate access and refresh
-                # tokens
-                else:
-                    logger.info(
-                        f"User {user_info['email']} is logging in for the first time.")
-                    user = User.objects.create(
-                        email=user_info['email'],
-                        full_name=user_info['name'],
-                    )
-
-                    token = RefreshToken.for_user(user)
-
-                    return Response({
-                        'refresh_token': str(token),
-                        'access_token': str(token.access_token),
-                    })
-
-            # If an exception is raised during authentication, return a bad
-            # request response
-            except (ValueError,) as e:
-                print(e)
-                logger.warning(f"User  is logging in failed.",
-                               extra={'data': e})
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class PassLogin(generics.GenericAPIView):
     serializer_class = LoginPassSerializer
 
     def post(self, request, *args, **kwargs):
@@ -247,9 +153,10 @@ class PassLogin(generics.GenericAPIView):
         else:
 
             logger.warning(f"User  is logging in failed.", extra={
-                           'data': "Invalid email or password"})
+                           'data': "email and password are required"})
             # Invalid request, missing email or password
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                            "message": "email and password are required"})
 
 
 class SignUpView(generics.CreateAPIView):
