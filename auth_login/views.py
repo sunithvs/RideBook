@@ -10,12 +10,14 @@ from rest_framework import permissions
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from base.permissions import IsOwner
 from config.settings import GOOGLE_CLIENT_ID
 from .models import User
-from .serializers import UserSerializer, LoginSerializer, LoginPassSerializer, SignUpSerializer, TokenSerializer
+from .serializers import UserSerializer, LoginSerializer, LoginSerializer, SignUpSerializer, TokenSerializer
 
 logger = logging.getLogger('auth')
 
@@ -100,23 +102,33 @@ class Profile(viewsets.ViewSet):
 
 
 class LogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated, ]
-
     def post(self, request, *args, **kwargs):
         """
-        Log out the currently authenticated user by deleting their authentication token.
+        Log out the currently authenticated user by blacklisting their refresh token.
         """
-        # Delete the user's authentication token to force them to log in again
-        logger.info(f"User {request.user.id} is logging out.")
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            try:
+                token.blacklist()
+            except AttributeError:
+                # The token is already blacklisted
+                pass
 
-        request.user.auth_token.delete()
-
-        # Return a success response
-        return Response(status=status.HTTP_200_OK)
+            logger.info(f"User {request.user.id} has been logged out.")
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except TokenError:
+            logger.warning(f"User {request.user.id} is logging out failed.",
+                           extra={'data': "Invalid token"})
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={
+                            "message": "Invalid token"})
+        except Exception as e:
+            logger.warning(f"User {request.user.id} is logging out failed.{type(e)}")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(generics.GenericAPIView):
-    serializer_class = LoginPassSerializer
+    serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
         """

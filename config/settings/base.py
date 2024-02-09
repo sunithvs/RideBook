@@ -62,6 +62,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     'drf_yasg',
     'ckeditor',
+    'rest_framework_simplejwt'
 ]
 
 # Custom apps
@@ -88,6 +89,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #jwt middleware
+
 ]
 
 # Root URL configuration
