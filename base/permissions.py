@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+from driver.models import Driver
+
 
 class IsOwner(permissions.BasePermission):
     """
@@ -43,3 +45,12 @@ class IsOwnObj(permissions.BasePermission):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
         return obj.user == request.user
+
+
+class IsDriver(permissions.BasePermission):
+    """
+    Custom permission to only allow drivers to access the API.
+    """
+
+    def has_permission(self, request, view):
+        return Driver.objects.filter(user=request.user).exists()

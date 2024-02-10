@@ -48,6 +48,9 @@ urlpatterns = [
         "ride/",
         include("rider.urls")),
     path(
+        "driver/",
+        include("driver.urls")),
+    path(
         settings.ADMIN_URL,
         admin.site.urls),
     re_path(

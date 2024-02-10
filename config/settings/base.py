@@ -3,8 +3,8 @@ base.py
 Base Settings for Django Project
 """
 
-import os
 from pathlib import Path
+
 import environ
 
 env = environ.Env()
@@ -70,6 +70,7 @@ THIRD_PARTY_APPS = [
 CUSTOM_APPS = [
     "auth_login",
     'rider',
+    'driver',
 ]
 
 INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY_APPS
