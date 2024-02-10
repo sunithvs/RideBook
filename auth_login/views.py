@@ -3,21 +3,17 @@ import logging
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from google.auth.transport import requests
-from google.oauth2 import id_token
 from rest_framework import generics, status, viewsets
 from rest_framework import permissions
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from base.permissions import IsOwner
-from config.settings import GOOGLE_CLIENT_ID
 from .models import User
-from .serializers import UserSerializer, LoginSerializer, LoginSerializer, SignUpSerializer, TokenSerializer
+from .serializers import UserSerializer, LoginSerializer, SignUpSerializer, TokenSerializer
 
 logger = logging.getLogger('auth')
 
@@ -208,4 +204,4 @@ class SignUpView(generics.CreateAPIView):
         return Response({
             'refresh': str(token),
             'access': str(token.access_token),
-        })
+        }, status=status.HTTP_201_CREATED)
