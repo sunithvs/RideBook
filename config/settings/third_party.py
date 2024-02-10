@@ -3,9 +3,8 @@
 """
 
 import os
+
 from .base import *
-
-
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
@@ -188,7 +187,7 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "solar",
 }
 
-LOG_VIEWER_FILES = ['auth.log', 'organisation.log', 'default.log']
+LOG_VIEWER_FILES = ['auth.log', 'rider.log', 'default.log']
 LOG_VIEWER_FILES_PATTERN = '*'
 LOG_VIEWER_FILES_DIR = os.path.join(BASE_DIR, 'logs')
 LOG_VIEWER_MAX_READ_LINES = 1000  # total log lines will be read
@@ -213,7 +212,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
-        'organisation': {
+        'rider': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(LOGGING_ROOT, 'rider.log'),
@@ -258,8 +257,8 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'organisation': {
-            'handlers': ['console', 'organisation'],
+        'rider': {
+            'handlers': ['console', 'rider'],
             'level': 'INFO',
             'propagate': False,
         },

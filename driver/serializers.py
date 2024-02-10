@@ -37,3 +37,6 @@ class DriverSerializer(serializers.ModelSerializer):
             # If location_data is a dictionary, convert it to a Point object
             validated_data['location'] = self.validate_location(location_data)
         return super().update(instance, validated_data)
+
+
+

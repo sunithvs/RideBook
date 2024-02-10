@@ -11,7 +11,7 @@ class RideSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ride
-        fields = ['id', 'rider', 'driver', 'pickup_location', 'dropoff_location',
+        fields = ['id', 'name', 'rider', 'driver', 'pickup_location', 'dropoff_location',
                   'status', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at', 'status', 'rider', 'driver']
 
@@ -35,3 +35,10 @@ class RideSerializer(serializers.ModelSerializer):
 
         ride = Ride.objects.create(pickup_location=pickup_location, dropoff_location=dropoff_location, **validated_data)
         return ride
+
+
+class DriverRideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ride
+        fields = ['id', 'rider', 'pickup_location', 'dropoff_location', 'status']
+        read_only_fields = ['id', 'rider', 'pickup_location', 'dropoff_location', 'status']

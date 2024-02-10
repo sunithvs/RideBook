@@ -1,4 +1,6 @@
 # Create your views here.
+import logging
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions, status
@@ -8,6 +10,8 @@ from rest_framework.response import Response
 
 from rider.models import Ride
 from rider.serializers import RideSerializer
+
+logger = logging.getLogger("auth")
 
 
 class RideViewSet(viewsets.ModelViewSet):
@@ -21,6 +25,7 @@ class RideViewSet(viewsets.ModelViewSet):
         return Ride.objects.filter(rider=self.request.user)
 
     def perform_create(self, serializer):
+        #TODO: cancel all other rides that are pending
         serializer.save(rider=self.request.user)
 
     # extra action to cancel a ride

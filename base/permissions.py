@@ -53,4 +53,4 @@ class IsDriver(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        return Driver.objects.filter(user=request.user).exists()
+        return request.user.is_authenticated and Driver.objects.filter(user=request.user).exists()
