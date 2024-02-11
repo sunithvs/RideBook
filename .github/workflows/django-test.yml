@@ -9,17 +9,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: testing
-    env:
-      POSTGRES_DB_NAME: ${{ secrets.POSTGRES_DB_NAME }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-
 
     services:
       postgres:
         image: postgis/postgis:13-3.1
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready  --health-interval 10s --health-timeout 5s --health-retries 5
@@ -38,8 +35,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+
+
       - name: Run Migrations
         run: python manage.py migrate
+        env:
+          POSTGRES_DB_NAME: ${{ secrets.POSTGRES_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
 
       - name: Run Tests
         run: python manage.py test
+        env:
+          POSTGRES_DB_NAME: ${{ secrets.POSTGRES_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
