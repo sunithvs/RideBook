@@ -43,7 +43,7 @@ jobs:
           echo "DB_PORT=5432" >> .env
 
       - name: Run Docker Containers
-        run: docker compose up -d
+        run: docker compose up
 
       - name: Wait for Services to Start
         run: |
