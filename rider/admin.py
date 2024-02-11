@@ -8,7 +8,7 @@ from .models import Ride
 @admin.register(Ride)
 class RideAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'rider', 'driver', 'pickup_location', 'dropoff_location', 'status', 'created_at', 'updated_at')
+        'name', 'rider', 'driver', 'pickup_location', 'dropoff_location', 'status', 'created_at', 'updated_at',)
     search_fields = (
         'name', 'rider__user__email',)
     list_filter = ('status', 'created_at', 'updated_at')
@@ -25,5 +25,4 @@ class RideAdmin(admin.ModelAdmin):
             'fields': ('rejected_drivers',),
             'classes': ('collapse',)
         }),
-
     )

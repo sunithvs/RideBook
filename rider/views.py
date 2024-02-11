@@ -25,7 +25,11 @@ class RideViewSet(viewsets.ModelViewSet):
         return Ride.objects.filter(rider=self.request.user)
 
     def perform_create(self, serializer):
-        #TODO: cancel all other rides that are pending
+        # cancel any pending rides
+        rides = Ride.objects.filter(rider=self.request.user, status='PENDING')
+        logger.info(f"Rides to cancel: {rides}")
+        for ride in rides:
+            ride.cancel()
         serializer.save(rider=self.request.user)
 
     # extra action to cancel a ride

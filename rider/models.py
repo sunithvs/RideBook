@@ -43,6 +43,7 @@ class Ride(models.Model):
 
     def cancel(self):
         self.status = 'CANCELLED'
+        self.drivers.clear()
         self.save()
 
     @property

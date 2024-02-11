@@ -5,6 +5,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
+from config.settings import MAX_RADIUS
 from driver.models import Driver
 
 logger = logging.getLogger("rider")
@@ -13,32 +14,31 @@ logger = logging.getLogger("rider")
 def add_ride_to_driver_ride_requests(ride):
     if ride.pickup_location:
         logger.info(f"Finding optimal driver for ride {ride.id}")
-        optimal_driver = find_optimal_driver(ride)
-        logger.info(f"Optimal driver for ride {ride.id} is {optimal_driver}")
+        optimal_driver = find_optimal_drivers(ride)
+        logger.info(f"Optimal drivers for ride {ride.id} is {optimal_driver.count() if optimal_driver else 0}")
 
-        if optimal_driver:
-            optimal_driver.ride_requests.add(ride)
-            logger.info(f"Ride {ride.id} added to driver {optimal_driver.id} ride requests")
+        for driver in optimal_driver:
+            driver.ride_requests.add(ride)
+            logger.info(f"Ride {ride.id} added to driver {driver.id} ride requests")
 
 
-def find_optimal_driver(ride):
+def find_optimal_drivers(ride):
     pickup_location = ride.pickup_location
     logger.info(f"Finding optimal driver for pickup location {pickup_location}")
     try:
         optimal_driver = Driver.objects.filter(
             available=True,
-            location__isnull=False,  # Ensure the driver has a valid location
+            location__isnull=False,
         ).exclude(
-            id__in=ride.rejected_drivers.all()  # Exclude drivers who have rejected this ride
+            id__in=ride.rejected_drivers.all()
         ).annotate(
             distance=Distance('location', pickup_location),
         ).filter(
-            Q(ride_requests__isnull=True) | Q(ride_requests__status__in=['COMPLETED', 'CANCELLED'])
-        ).order_by('distance').first()
+            distance__lte=MAX_RADIUS*1000,  # Filter drivers within 10 km
+        )
+        logger.info(f"Optimal drivers found for pickup location {pickup_location}: {optimal_driver}")
 
-        logger.info(f"Optimal driver found for pickup location {pickup_location}: {optimal_driver}")
-
-        return optimal_driver if optimal_driver else None
+        return optimal_driver
     except ObjectDoesNotExist:
         logger.error(f"No optimal driver found for pickup location {pickup_location}")
         return None

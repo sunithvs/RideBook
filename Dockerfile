@@ -25,6 +25,5 @@ RUN apt-get update \
 # Expose the port on which Gunicorn will run
 EXPOSE 8000
 
-# if production use gunicorn else use django server
-#CMD ["gunicorn", "--bind", ":8000", "--workers", "3", "config.wsgi:application"]
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+entrypoint ["./scripts/run.sh"]
+

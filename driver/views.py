@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from base.permissions import IsDriver
 from rider.models import Ride
 from rider.serializers import DriverRideSerializer
-from rider.utils import find_optimal_driver
+from rider.utils import add_ride_to_driver_ride_requests
 from .models import Driver
 from .serializers import DriverSerializer
 
@@ -68,7 +68,9 @@ class DriverRideViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.is_anonymous:
             return Ride.objects.none()
-        return self.request.user.driver.ride_requests.all()
+        driver_rides = Ride.objects.filter(driver=self.request.user.driver)
+        ride_requests = self.request.user.driver.ride_requests.all()
+        return driver_rides | ride_requests
 
     def perform_create(self, serializer):
         pass
@@ -92,10 +94,7 @@ class DriverRideViewSet(viewsets.ModelViewSet):
             # Set driver's availability to False
             driver.available = False
             driver.save()
-            driver.ride_requests.remove(ride)
-            # Remove all objects from ride_requests
-            for ride_request in driver.ride_requests.all():
-                find_optimal_driver(ride_request)
+            ride.drivers.clear()
             driver.ride_requests.clear()
             # Assign the ride to the driver
             ride.driver = driver
@@ -115,9 +114,9 @@ class DriverRideViewSet(viewsets.ModelViewSet):
     def complete_ride(self, request, pk=None):
         ride = self.get_object()
         driver = request.user.driver
-
-        if ride.driver != driver or ride.status != 'IN_PROGRESS':
-            return Response({'message': 'Ride cannot be completed'}, status=status.HTTP_400_BAD_REQUEST)
+        ride = driver.rides_as_driver.get(id=ride.id)
+        if ride and ride.status != 'IN_PROGRESS' and ride.pk != pk:
+            return Response({'message': 'Invalid Request'}, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
             # Set driver's availability to True
@@ -148,9 +147,5 @@ class DriverRideViewSet(viewsets.ModelViewSet):
             driver.ride_requests.remove(ride)
             driver.save()
             logger.info(f"Finding optimal driver for ride {ride.id}")
-            new_driver = find_optimal_driver(ride)
-            logger.info(f"Optimal driver for ride {ride.id} is {new_driver}")
-            if new_driver:
-                new_driver.ride_requests.add(ride)
-                logger.info(f"Ride {ride.id} added to driver {new_driver.id} ride requests")
+            add_ride_to_driver_ride_requests(ride)
         return Response({'message': 'Ride cancelled'}, status=status.HTTP_200_OK)

@@ -141,3 +141,6 @@ USE_I18N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = "auth_login.User"
+
+# MAX Circle Radius for optimal driver search
+MAX_RADIUS = 10  # in KM
