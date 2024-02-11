@@ -25,6 +25,8 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       - name: Set up Docker Compose environment variables
         run: |
           echo "DB_HOST=${DB_HOST}" >> .env
@@ -39,9 +41,8 @@ jobs:
           echo "DEBUG=True" >> .env
           pwd
           ls -la
-
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+      
+      
 
       - name: Build Docker Image
         run: docker-compose build
