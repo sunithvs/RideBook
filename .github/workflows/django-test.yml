@@ -39,6 +39,8 @@ jobs:
           echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
           echo "SECRET_KEY=${SECRET_KEY}" >> .env
           echo "DEBUG=True" >> .env
+          echo "DB_HOST=db" >> .env
+          echo "DB_PORT=5432" >> .env
 
       - name: Build Docker Image
         run: docker compose build
