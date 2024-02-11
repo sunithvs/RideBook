@@ -12,8 +12,7 @@ jobs:
     services:
       docker:
         image: docker:20.10.11
-        options:
-          - --group-add=$(stat -c %g /var/run/docker.sock)
+        options: --group-add=$(stat -c %g /var/run/docker.sock)
     env:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
