@@ -12,17 +12,19 @@ COPY requirements.txt /code/
 # Copy the project code into the container
 COPY . /code/
 
-RUN pip install --upgrade pip
-
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Install GDAL dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gdal-bin \
         libgdal-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+
+RUN pip install --upgrade pip
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+
 
 # Expose the port on which Gunicorn will run
 EXPOSE 8000
