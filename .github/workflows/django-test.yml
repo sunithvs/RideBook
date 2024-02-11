@@ -42,9 +42,6 @@ jobs:
           echo "DB_HOST=db" >> .env
           echo "DB_PORT=5432" >> .env
 
-      - name: Build Docker Image
-        run: docker compose build
-
       - name: Run Docker Containers
         run: docker compose up -d
 
