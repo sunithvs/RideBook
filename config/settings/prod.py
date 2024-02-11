@@ -11,23 +11,26 @@ DEBUG = False
 # Allowed hosts
 ALLOWED_HOSTS = [
     'rider.sunithvs.com',
+    'localhost',
 ]
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
     'https://rider.sunithvs.com',
+    'http://localhost:8000',
 ]
 
 # CORS settings
 CORS_ORIGIN_WHITELIST = [
     'https://rider.sunithvs.com',
+    'http://localhost:8000',
 ]
 CORS_ORIGIN_ALLOW_ALL = False
 
 # Database settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': env.str('POSTGRES_DB'),
         'USER': env.str('POSTGRES_USER'),
         'PASSWORD': env.str('POSTGRES_PASSWORD'),
@@ -35,7 +38,6 @@ DATABASES = {
         'PORT': env.str('DB_PORT'),
     }
 }
-
 # Static and media files
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_BASE_URL = "media"

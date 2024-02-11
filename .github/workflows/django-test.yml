@@ -1,0 +1,46 @@
+name: Django CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgis/postgis:13-3.1
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        volumes:
+          - ps_data:/var/lib/postgresql/data
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U " ${{ secrets.POSTGRES_USER }} "-d" ${{ secrets.POSTGRES_DB }} --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Dependencies
+
+        run: |
+          apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev 
+          rm -rf /var/lib/apt/lists/*
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Migrations
+        run: python manage.py migrate
+
+      - name: Run Tests
+        run: python manage.py test

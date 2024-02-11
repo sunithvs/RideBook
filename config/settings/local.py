@@ -21,25 +21,13 @@ DATABASES = {
     }
 }
 
-# Static files URL
-STATIC_URL = '/static/'
-
-# Media files URL
+# Static and media files
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_BASE_URL = "media"
 MEDIA_URL = '/media/'
 
-# Base URL for media files (e.g., when serving from a different domain)
-MEDIA_BASE_URL = "http://localhost:3000"
-
-# Additional directories to search for static files
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-# Custom user model
-
-
-# Media root directory
-MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Replace with your staging static files directory
+STATIC_URL = '/static/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
