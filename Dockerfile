@@ -12,6 +12,8 @@ COPY requirements.txt /code/
 # Copy the project code into the container
 COPY . /code/
 
+RUN pip install --upgrade pip
+
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
