@@ -2,40 +2,43 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from auth_login.models import User
+from driver.models import Driver
 from .models import Ride
+
+locations = {
+    'karinkallathani': {
+        'latitude': 10.953835531166668,
+        'longitude': 76.31819526049492
+    },
+    'amminikkad': {
+        'latitude': 10.972923883788043,
+        'longitude': 76.27217966094805
+    },
+    'perinthalmanna': {
+        'latitude': 10.976871402847019,
+        'longitude': 76.21234777594263
+    },
+    'mannarkkad': {
+        'latitude': 11.001866146835766,
+        'longitude': 76.45459713276014
+    },
+    'cherpulassery': {
+        'latitude': 10.871870434770171,
+        'longitude': 76.31346687683643
+
+    }
+}
 
 
 class RideViewSetTestCase(APITestCase):
     fixtures = ['auth_login/fixtures/auth_login.json', 'driver/fixtures/driver.json', ]
 
     def setUp(self):
-        self.user = User.objects.create_user(email='test@gmail.com', full_name='testuser', password='password')
+        self.user = User.objects.create_user(email='test@gmail.com',
+                                             full_name='testuser', password='password')
         self.client.force_authenticate(user=self.user)
         Ride.objects.create(rider=self.user, name='Ride 1', pickup_location='POINT(1.234 1.234)',
                             dropoff_location='POINT(2.234 2.234)')
-        self.locations = {
-            'karinkallathani': {
-                'latitude': 10.953835531166668,
-                'longitude': 76.31819526049492
-            },
-            'amminikkad': {
-                'latitude': 10.972923883788043,
-                'longitude': 76.27217966094805
-            },
-            'perinthalmanna': {
-                'latitude': 10.976871402847019,
-                'longitude': 76.21234777594263
-            },
-            'mannarkkad': {
-                'latitude': 11.001866146835766,
-                'longitude': 76.45459713276014
-            },
-            'cherpulassery': {
-                'latitude': 10.871870434770171,
-                'longitude': 76.31346687683643
-
-            }
-        }
 
     def test_list_rides(self):
         response = self.client.get(reverse('ride-list'))
@@ -46,39 +49,48 @@ class RideViewSetTestCase(APITestCase):
     def test_create_ride(self):
         response = self.client.post(reverse('ride-list'), {
             'name': 'Ride 2',
-            'pickup_location': self.locations['karinkallathani'],
-            'dropoff_location': self.locations['mannarkkad']
+            'pickup_location': locations['karinkallathani'],
+            'dropoff_location': locations['mannarkkad']
         }, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Ride.objects.count(), 2)
 
     def test_cancel_ride(self):
-        response = self.client.post(reverse('ride-cancel', kwargs={'pk': 1}))
+        response = self.client.post(reverse('ride-list'), {
+            'name': 'Ride 2',
+            'pickup_location': locations['karinkallathani'],
+            'dropoff_location': locations['mannarkkad']
+        }, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Ride.objects.count(), 2)
+        ride = Ride.objects.get(name='Ride 2')
+        drivers = ride.drivers.all()
+        response = self.client.post(reverse('ride-cancel', kwargs={'pk': ride.id}))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Ride.objects.get(pk=1).status, 'CANCELLED')
-        response = self.client.post(reverse('ride-cancel', kwargs={'pk': 1}))
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Ride.objects.get(pk=1).status, 'CANCELLED')
+        ride.refresh_from_db()
+        self.assertEqual(ride.status, 'CANCELLED')
+        for driver in drivers:
+            self.assertEqual(driver.ride_requests.filter(id=ride.id).exists(), False)
 
     def test_pending_ride_auto_cancel(self):
         response = self.client.post(reverse('ride-list'), {
             'name': 'Ride 3',
-            'pickup_location': self.locations['karinkallathani'],
-            'dropoff_location': self.locations['mannarkkad']
+            'pickup_location': locations['karinkallathani'],
+            'dropoff_location': locations['mannarkkad']
         }, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Ride.objects.count(), 2)
         response = self.client.post(reverse('ride-list'), {
             'name': 'Ride 4',
-            'pickup_location': self.locations['karinkallathani'],
-            'dropoff_location': self.locations['mannarkkad']
+            'pickup_location': locations['karinkallathani'],
+            'dropoff_location': locations['mannarkkad']
         }, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Ride.objects.count(), 3)
         response = self.client.post(reverse('ride-list'), {
             'name': 'Ride 5',
-            'pickup_location': self.locations['karinkallathani'],
-            'dropoff_location': self.locations['mannarkkad']
+            'pickup_location': locations['karinkallathani'],
+            'dropoff_location': locations['mannarkkad']
         }, format='json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Ride.objects.count(), 4)
@@ -86,4 +98,20 @@ class RideViewSetTestCase(APITestCase):
         self.assertEqual(Ride.objects.filter(status='CANCELLED').count(), 3)
         self.assertEqual(Ride.objects.filter(status='PENDING').count(), 1)
 
+    def test_ride_allocation(self):
+        response = self.client.post(reverse('ride-list'), {
+            'name': 'Ride 1',
+            'pickup_location': locations['perinthalmanna'],
+            'dropoff_location': locations['mannarkkad']
+        }, format='json')
 
+        target_drivers = [
+            'driver2@gmail.com',
+            'driver1@gmail.com',
+        ]
+        self.assertEqual(response.status_code, 201)
+        for driver in target_drivers:
+            self.assertEqual(Driver.objects.get(user__email=driver).ride_requests.filter(name='Ride 1').exists(),
+                             True)
+        for driver in Driver.objects.exclude(user__email__in=target_drivers):
+            self.assertEqual(driver.ride_requests.filter(name='Ride 1').exists(), False)
