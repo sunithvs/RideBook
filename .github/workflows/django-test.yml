@@ -39,16 +39,12 @@ jobs:
           echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
           echo "SECRET_KEY=${SECRET_KEY}" >> .env
           echo "DEBUG=True" >> .env
-          pwd
-          ls -la
-      
-      
 
       - name: Build Docker Image
-        run: docker-compose build
+        run: docker compose build
 
       - name: Run Docker Containers
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for Services to Start
         run: |
@@ -58,7 +54,7 @@ jobs:
           done
 
       - name: Run Tests
-        run: docker-compose exec web python manage.py test
+        run: docker compose exec web python manage.py test
 
       - name: Clean Up Docker Containers
-        run: docker-compose down
+        run: docker compose down
