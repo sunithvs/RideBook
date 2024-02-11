@@ -144,3 +144,26 @@ AUTH_USER_MODEL = "auth_login.User"
 
 # MAX Circle Radius for optimal driver search
 MAX_RADIUS = 10  # in KM
+locations = {
+    'karinkallathani': {
+        'latitude': 10.953835531166668,
+        'longitude': 76.31819526049492
+    },
+    'amminikkad': {
+        'latitude': 10.972923883788043,
+        'longitude': 76.27217966094805
+    },
+    'perinthalmanna': {
+        'latitude': 10.976871402847019,
+        'longitude': 76.21234777594263
+    },
+    'mannarkkad': {
+        'latitude': 11.001866146835766,
+        'longitude': 76.45459713276014
+    },
+    'cherpulassery': {
+        'latitude': 10.871870434770171,
+        'longitude': 76.31346687683643
+
+    }
+}

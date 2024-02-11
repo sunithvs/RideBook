@@ -2,32 +2,11 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from auth_login.models import User
+from config.settings import locations
 from driver.models import Driver
 from .models import Ride
 
-locations = {
-    'karinkallathani': {
-        'latitude': 10.953835531166668,
-        'longitude': 76.31819526049492
-    },
-    'amminikkad': {
-        'latitude': 10.972923883788043,
-        'longitude': 76.27217966094805
-    },
-    'perinthalmanna': {
-        'latitude': 10.976871402847019,
-        'longitude': 76.21234777594263
-    },
-    'mannarkkad': {
-        'latitude': 11.001866146835766,
-        'longitude': 76.45459713276014
-    },
-    'cherpulassery': {
-        'latitude': 10.871870434770171,
-        'longitude': 76.31346687683643
 
-    }
-}
 
 
 class RideViewSetTestCase(APITestCase):
