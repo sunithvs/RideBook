@@ -10,6 +10,7 @@ from rider.utils import add_ride_to_driver_ride_requests
 
 logger = logging.getLogger("rider")
 
+
 class Ride(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
