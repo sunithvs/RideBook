@@ -36,9 +36,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Wait for Database to Start
+        run: dockerize -wait tcp://localhost:5432 -timeout 1m
+
       - name: Run Migrations
         run: python manage.py migrate
 
       - name: Run Tests
         run: python manage.py test
 
+      - name: Clean Up Database Container
+        run: docker-compose down
