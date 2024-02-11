@@ -13,14 +13,12 @@ jobs:
       db:
         image: postgis/postgis:13-3.1
         env:
-          POSTGRES_USER: ${{ POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ POSTGRES_DB }}
-        volumes:
-          - ps_data:/var/lib/postgresql/data
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
-        options: --health-cmd "pg_isready -U " ${{ POSTGRES_USER }} "-d" ${{ POSTGRES_DB }} --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout Repository
@@ -32,7 +30,6 @@ jobs:
           python-version: 3.8
 
       - name: Install Dependencies
-
         run: |
           apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev 
           rm -rf /var/lib/apt/lists/*
@@ -44,3 +41,4 @@ jobs:
 
       - name: Run Tests
         run: python manage.py test
+
