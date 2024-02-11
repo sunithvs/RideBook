@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db:
+      postgres:
         image: postgis/postgis:13-3.1
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
@@ -18,7 +18,7 @@ jobs:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd pg_isready  --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout Repository
@@ -31,19 +31,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          apt-get update && apt-get install -y --no-install-recommends gdal-bin libgdal-dev 
-          rm -rf /var/lib/apt/lists/*
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Wait for Database to Start
-        run: dockerize -wait tcp://localhost:5432 -timeout 1m
 
       - name: Run Migrations
         run: python manage.py migrate
 
       - name: Run Tests
         run: python manage.py test
-
-      - name: Clean Up Database Container
-        run: docker-compose down
