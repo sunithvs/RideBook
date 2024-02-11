@@ -37,7 +37,8 @@ jobs:
           echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
           echo "SECRET_KEY=${SECRET_KEY}" >> .env
           echo "DEBUG=True" >> .env
-          cat .env
+          pwd
+          ls -la
 
       - name: Checkout Repository
         uses: actions/checkout@v2
