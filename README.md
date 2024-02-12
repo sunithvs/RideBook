@@ -1,4 +1,4 @@
-#  Internship Task Django
+#  Rider backend
 
 ## Introduction
 
