@@ -10,6 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from base.permissions import IsDriver
+from notifications.utils import send_message_to_channel
 from rider.models import Ride
 from rider.serializers import DriverRideSerializer
 from rider.utils import add_ride_to_driver_ride_requests
@@ -96,6 +97,7 @@ class DriverRideViewSet(viewsets.ModelViewSet):
             driver.save()
             ride.drivers.clear()
             driver.ride_requests.clear()
+            send_message_to_channel(f"notification__{driver.user.id}", "Ride Accept")
             # Assign the ride to the driver
             ride.driver = driver
             ride.status = 'IN_PROGRESS'

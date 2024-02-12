@@ -9,7 +9,7 @@ class RideConsumer(AsyncWebsocketConsumer):
         user_id = self.scope["user"].id
 
         # Create a unique channel name for the driver
-        driver_channel_name = f"driver_{user_id}"
+        driver_channel_name = f"notification_{user_id}"
 
         # Add the driver to the group with the unique channel name
         await self.channel_layer.group_add(
@@ -36,3 +36,9 @@ class RideConsumer(AsyncWebsocketConsumer):
         elif bytes_data:
             # Handle bytes_data if needed
             pass
+
+    async def send_message(self, event):
+        message = event['text']
+        print("msg to send", message)
+        # Handle the message as needed
+        await self.send(text_data=json.dumps({'message': message}))

@@ -1,14 +1,18 @@
 # utils.py
 import logging
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.gis.db.models.functions import Distance
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 
 from config.settings import MAX_RADIUS
 from driver.models import Driver
+from notifications.utils import send_message_to_channel
 
 logger = logging.getLogger("rider")
+
+
 
 
 def add_ride_to_driver_ride_requests(ride):
@@ -20,6 +24,14 @@ def add_ride_to_driver_ride_requests(ride):
         for driver in optimal_driver:
             driver.ride_requests.add(ride)
             logger.info(f"Ride {ride.id} added to driver {driver.id} ride requests")
+            try:
+                send_message_to_channel(f"notification__{driver.user.id}", "Ride request")
+                print("send notification to ", driver)
+            except Exception as e:
+                print(e)
+
+
+
 
 
 def find_optimal_drivers(ride):
