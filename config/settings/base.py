@@ -48,6 +48,7 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 
 # Installed apps
 INSTALLED_APPS = [
+    'daphne',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -63,7 +64,7 @@ THIRD_PARTY_APPS = [
     'drf_yasg',
     'ckeditor',
     'rest_framework_simplejwt',
-    'django.contrib.gis'
+    'django.contrib.gis',
 ]
 
 # Custom apps
@@ -71,10 +72,11 @@ CUSTOM_APPS = [
     "auth_login",
     'rider',
     'driver',
+    'notifications',
 ]
 
 INSTALLED_APPS += CUSTOM_APPS + THIRD_PARTY_APPS
-
+ASGI_APPLICATION = "config.asgi.application"
 # Application name
 APPLICATION_NAME = 'RIDER'
 
@@ -130,6 +132,14 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Define channel layer
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use an appropriate backend for production
+    },
+}
+
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
