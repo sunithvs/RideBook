@@ -54,7 +54,6 @@ class Ride(models.Model):
 
 @receiver(post_save, sender=Ride)
 def handle_ride_creation(sender, instance, created, **kwargs):
-    print("ride triggered")
     if created:
         logger.info(f"Ride {instance.id} created for {instance.rider.full_name}")
         add_ride_to_driver_ride_requests(instance)

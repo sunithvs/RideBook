@@ -80,8 +80,18 @@ ASGI_APPLICATION = "config.asgi.application"
 # Application name
 APPLICATION_NAME = 'RIDER'
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': env.str('POSTGRES_DB'),
+        'USER': env.str('POSTGRES_USER'),
+        'PASSWORD': env.str('POSTGRES_PASSWORD'),
+        'HOST': env.str('DB_HOST'),
+        'PORT': env.str('DB_PORT'),
+    }
+}
 # Login URL
-LOGIN_URL = "/auth/login/pass/"
+LOGIN_URL = "/auth/login/"
 
 # Middleware
 MIDDLEWARE = [

@@ -15,6 +15,16 @@ logger = logging.getLogger("auth")
 
 
 class RideViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for handling Ride operations.
+
+    queryset -- All Ride objects.
+    serializer_class -- The serializer class for Ride model.
+    permission_classes -- Only authenticated users are allowed.
+    pagination_class -- PageNumberPagination for listing rides.
+    http_method_names -- Only allow GET and POST methods.
+    """
+
     queryset = Ride.objects.all()
     serializer_class = RideSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -22,28 +32,59 @@ class RideViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post']
 
     def get_queryset(self):
+        """
+        Get the queryset filtered by the current user as the rider.
+
+        Returns:
+        Queryset -- Filtered Ride objects for the current user.
+        """
         return Ride.objects.filter(rider=self.request.user)
 
     def perform_create(self, serializer):
-        # cancel any pending rides
+        """
+        Create a new Ride instance.
+
+        Cancels any pending rides for the current user before creating a new ride.
+
+        Args:
+        serializer -- The serializer instance.
+
+        Returns:
+        None
+        """
+        # Cancel any pending rides for the current user
         rides = Ride.objects.filter(rider=self.request.user, status='PENDING')
-        logger.info(f"Rides to cancel: {rides}")
+        logger.info(f"Cancelling pending rides for rider {self.request.user}: {rides}")
         for ride in rides:
             ride.cancel()
+
+        # Save the new ride instance with the current user as the rider
         serializer.save(rider=self.request.user)
 
-    # extra action to cancel a ride
+        logger.info(f"New ride created for rider {self.request.user}")
+
     @swagger_auto_schema(
         methods=['post'],
         operation_summary='Cancel a ride',
         operation_description='Cancel a ride',
         responses={200: 'Ride cancelled', 400: 'Ride cannot be cancelled'},
         request_body=openapi.Schema(type=openapi.TYPE_OBJECT),  # Empty request body
-
     )
     @action(detail=True, methods=['post'], url_path='cancel', url_name='cancel')
     def cancel(self, request, pk=None):
-        if not self.get_object().can_cancel:
-            return Response({'message': 'ride cannot be cancelled'}, status=status.HTTP_400_BAD_REQUEST)
-        self.get_object().cancel()
-        return Response({'message': 'ride cancelled'}, status=status.HTTP_200_OK)
+        """
+        Cancel a ride.
+
+        Returns:
+        Response -- HTTP 200 on success, HTTP 400 on failure.
+        """
+        ride = self.get_object()
+
+        if not ride.can_cancel:
+            logger.warning(f"Ride {ride.id} cannot be cancelled.")
+            return Response({'message': 'Ride cannot be cancelled'}, status=status.HTTP_400_BAD_REQUEST)
+
+        ride.cancel()
+
+        logger.info(f"Ride {ride.id} cancelled by rider {request.user}")
+        return Response({'message': 'Ride cancelled'}, status=status.HTTP_200_OK)
