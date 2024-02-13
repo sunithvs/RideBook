@@ -10,20 +10,17 @@ DEBUG = False
 
 # Allowed hosts
 ALLOWED_HOSTS = [
-    'rider.sunithvs.com',
-    'localhost',
+    'ride.sunithvs.com',
 ]
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://rider.sunithvs.com',
-    'http://localhost:8000',
+    'https://ride.sunithvs.com',
 ]
 
 # CORS settings
 CORS_ORIGIN_WHITELIST = [
-    'https://rider.sunithvs.com',
-    'http://localhost:8000',
+    'https://ride.sunithvs.com',
 ]
 CORS_ORIGIN_ALLOW_ALL = False
 
